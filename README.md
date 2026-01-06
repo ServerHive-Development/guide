@@ -1,69 +1,59 @@
-# 🐝 **ServerHive — Shared Bare-Metal Build Servers**
+# 🐝 **ServerHive — Enterprise Bare-Metal Build Environment**
 
-Welcome to **ServerHive**! This guide will walk you through everything you need to know to start using your **enterprise-grade shared bare-metal build server**. 🚀🐝
-
----
-
-## ⚡ What We Offer
-
-ServerHive provides **raw-performance** shared dedicated servers designed for serious Android/ROM development.
-
-### 🤔 Why Not VPS Instances?
-
-Because virtual machines can’t match **bare-metal power**.
-We want you to experience *true performance* with no hypervisor bottlenecks.
-
-> 💬 **Need a fully dedicated instance?**
-> We can arrange one on request.
-
-🔒 **We are being strictly monitored by our cloud provider for illegal or abusive usage** — we invest heavily to keep the ecosystem clean and fast.
+Welcome to **ServerHive**! This guide provides the essential knowledge to maximize your productivity on our **enterprise-grade shared bare-metal build servers**. Designed specifically for high-performance Android and ROM development, ServerHive eliminates the bottlenecks of traditional virtualization. 🚀🐝
 
 ---
 
-## 🧰 ServerHive Features
+## ⚡ The ServerHive Advantage
 
-Enjoy a powerful ecosystem built for developers:
+We provide **raw, native performance** on dedicated hardware. Unlike VPS instances, our bare-metal architecture ensures that every cycle of the CPU is dedicated to your build tasks, with no hypervisor overhead.
 
-* ⏸️ **Pause / Resume Plans** – Take breaks without losing days
-* 📁 **ServerHive Drive** – Lifetime free storage with fast speeds
-* 🖥️ **CodeServer Access** – Full web IDE in your browser
-* 📡 **Live Build Tracking** – Watch builds in real-time
-* 📱 **ServerHive Mini-App** – Manage from your phone
-* 💳 **Wallet Integration** – Easy payments & balance
-* 🔔 **Group Alerts & Push Notifications** – Always stay updated
-* 📦 **Multiple ROM Sources** – Keep multiple repos without hassle
-* 📤 **Auto-Upload** – Completed builds auto-upload to Drive/GoFile
+### Why Bare-Metal?
+Virtual machines often suffer from "noisy neighbor" effects and I/O latency. Our environment is optimized for the intense multi-threaded workloads required for modern ROM compilation.
 
-> ℹ️ **Some features vary by plan type. Always confirm with admins.**
+> 💬 **Need a fully dedicated instance?** 
+> Private, non-shared servers are available upon request for enterprise users.
+
+🔒 **Security & Policy:** Our infrastructure is strictly monitored for compliance. We maintain a zero-tolerance policy for illegal or abusive usage to ensure a clean, high-speed ecosystem for all legitimate developers.
+
+---
+
+## 🧰 Key Features
+
+* ⏸️ **Flexible Billing** – Pause and resume your plans to save your balance.
+* 📁 **ServerHive Drive** – High-speed, permanent storage for your assets.
+* 🖥️ **Integrated IDE** – Access a full CodeServer (VS Code) instance directly in your browser.
+* 📡 **Real-Time Monitoring** – Track build progress and system health through our dashboard.
+* 📱 **Mobile Management** – Use our Mini-App to manage your server on the go.
+* 💳 **Unified Wallet** – Seamless payments and automated balance management.
+* 🛡️ **Automated Verification** – AI-powered instant payment verifications for credits.
+* 📤 **Automated Deployment** – Auto-upload completed builds to Drive or GoFile.
 
 ---
 
 ## 🧩 Getting Started
 
-You’ll receive your SSH credentials once your server is ready.
+Your SSH credentials will be delivered via your dashboard or admin once your environment is provisioned.
 
 ### Recommended SSH Clients
+* 📱 **Mobile:** [Termux](https://termux.dev/) (Android) or [Ish](https://ish.app/) (iOS)
+* 💻 **Desktop:** [Termius](https://termius.com/), [PuTTY](https://www.putty.org/), or your native system terminal.
 
-📱 **Android:** Termux
-💻 **Cross-platform:** Termius
-🖥️ **PC:** Any standard SSH client
-
-### Example Login
-
+### Accessing Your Server
 ```bash
-ssh username@server.serverhive.com -p22
+ssh username@server.serverhive.com -p 22
 ```
 
 ---
 
-# 🔨 Complete Build Workflow
+# 🔨 The Build Workflow
 
-Each ROM must run in **its own Byobu session** to prevent conflicts.
+To maintain stability in a shared environment, all builds **must** be executed within a persistent session.
 
 ---
 
-## 🔧 Step 1: Configure Git Settings
-
+## 🔧 Step 1: Global Git Configuration
+Set up your identity before starting any repository operations.
 ```bash
 git config --global user.name "Your Name"
 git config --global user.email "your.email@example.com"
@@ -71,253 +61,122 @@ git config --global user.email "your.email@example.com"
 
 ---
 
-## 🍪 Step 2: Set Up Git Cookies (Highly Recommended)
+## 🍪 Step 2: Git Cookies (Performance Optimization)
+Google implements aggressive rate-limiting on unauthenticated high-concurrency syncs, often resulting in **429 Too Many Requests** errors. Using Git cookies is highly recommended to ensure reliable synchronization. ⚡
 
-Google rate-limits high concurrency syncs, leading to **429 errors**.
-Git cookies fix this. ⚡
+### Benefits
+* Prevents sync-interrupting rate limits.
+* Reduces metadata overhead.
+* Improves checkout reliability for large manifests.
 
-### ✨ Benefits:
-
-* Avoids corrupt checkouts
-* Reduces quota usage
-* Improves sync reliability
-
-### 🔍 How to Generate Git Cookies
-
-1. Open: [https://android.googlesource.com/](https://android.googlesource.com/)
-2. Click **Generate Password**
-3. Go to **Configure Git**
-4. Copy the Linux (bash) script
-5. Run it in your terminal
-
-Example:
-
-```bash
-touch ~/.gitcookies
-chmod 0600 ~/.gitcookies
-git config --global http.cookiefile ~/.gitcookies
-```
-
-### ❌ Don’t want cookies?
-
-```bash
-git config --global http.cookiefile ""
-```
+### Setup Instructions
+1. Visit [android.googlesource.com](https://android.googlesource.com/).
+2. Click **"Generate Password"**.
+3. Authenticate and follow the **"Configure Git"** instructions.
+4. Copy and execute the provided shell script in your terminal.
 
 ---
 
-## 📁 Step 3: Initialize ROM Repository
-
+## 📁 Step 3: Initialize Repository
 ```bash
-mkdir -p ~/lineageos
-cd ~/lineageos
+mkdir -p ~/lineageos && cd ~/lineageos
 
+# Standard initialization
 repo init -u https://github.com/LineageOS/android.git -b lineage-21.0 --git-lfs
-```
 
-(Optional: depth)
-
-```bash
+# Shallow clone (Faster, saves space)
 repo init -u https://github.com/LineageOS/android.git -b lineage-21.0 --git-lfs --depth=1
 ```
 
 ---
 
-## 🔄 Step 4: Sync the Source
-
-```bash
-repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags
-```
-
-For optimized syncs:
-
+## 🔄 Step 4: Synchronize Source
+Use the following command for an optimized, high-speed sync:
 ```bash
 repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags --optimized-fetch --prune
 ```
 
 ---
 
-## 📦 Step 5: Source the Build Environment
-
-⚠️ **Always do this in a new session.**
-
+## 📦 Step 5: Environment Setup
+⚠️ **Note:** Always source your environment in a clean shell session to avoid variable pollution.
 ```bash
-cd ~/lineageos
 source build/envsetup.sh
 ```
 
 ---
 
-## 🏗️ Step 6: Build Your ROM
-
+## 🏗️ Step 6: Execute Build
 ```bash
+# Select your device
 breakfast <device_codename>
+
+# Start compilation
 brunch <device_codename>
-```
-
-Or:
-
-```bash
+# OR
 mka bacon
 ```
-
-🚫 **Avoid using `make`.**
-
----
-
-## 🖥️ Byobu (Sticky Screen)
-
-When you log in, you're already inside a **persistent Byobu session**.
-
-### 🎁 What This Means:
-
-Even if you:
-
-* lose network
-* close your terminal
-* disconnect accidentally
-
-➡️ **Your build keeps running.**
-
-### ✨ Basic Commands
-
-```bash
-# Detach
-F6 or Ctrl+a d
-
-# List sessions
-byobu-select-session
-
-# Reattach
-byobu
-
-# New window
-F2
-
-# Switch windows
-F3 / F4
-```
-
-📱 **In Termux:**
-Use **Volume Up + Number**
-
-* Vol+2 → F2
-* Vol+3 → F3
-* Vol+4 → F4
-* Vol+6 → F6
+🚫 **Pro Tip:** Avoid using generic `make`. Use `mka` or `brunch` for optimized resource allocation.
 
 ---
 
-## 🗃️ Managing Multiple ROMs
+## 🖥️ Persistent Sessions (Byobu/Tmux)
 
-⚠️ **NEVER reuse a Byobu session for a different ROM.**
+ServerHive uses **Byobu** as the default terminal multiplexer. When you login, you are automatically placed in a persistent session.
 
-Each ROM uses different:
+### The Power of Persistence
+If your connection drops or you close your terminal, **your build continues to run**. You can reattach at any time from any device.
 
-* build scripts
-* env variables
-* paths
-
-### Example:
-
-```bash
-# Session 1 - LineageOS
-byobu-screen -S lineageos-build
-cd ~/lineageos
-source build/envsetup.sh
-brunch device
-```
-
-```bash
-# Session 2 - PixelExperience
-byobu-screen -S pixelexperience-build
-cd ~/pixelexperience
-source build/envsetup.sh
-brunch device
-```
+### Essential Commands
+* **Detach:** `F6` or `Ctrl+a` then `d`
+* **New Window:** `F2`
+* **Navigate Windows:** `F3` (Previous) / `F4` (Next)
+* **Reattach:** Simply type `byobu` after logging back in.
 
 ---
 
-## 🔐 Root Access
+## 🗃️ Multi-ROM Management
+⚠️ **Constraint:** Never attempt to build two different ROMs within the same window or environment session. This will cause dependency conflicts.
 
-Root is **not provided** because most packages are already preinstalled.
-
-Need something installed?
-Just ask the admin. 😄
-
-Example:
-
-```
-Hi, can you please install the following?
-Command: sudo apt install <package-name>
-```
+**Recommended Workflow:**
+1. Create a new Byobu window (`F2`).
+2. Navigate to your second ROM directory.
+3. Source the environment and start your build.
 
 ---
 
-## ⏳ Plan Expiration
+## 🔐 Root Access & Package Management
 
-🗑️ After your plan expires, **all data is auto-deleted**.
+Standard **root access is not provided** for security and stability reasons. However, our environment is pre-configured with 99% of the tools you will ever need for Android development.
 
-### ❤️ Need More Time?
+### Developing Without Root (The 90/10 Rule)
+90% of development tasks on Linux **do not require root**. You can install local binaries, manage Python environments with `venv` or `uv`, and use Node.js via `nvm`—all within your home directory.
 
-Click **“Extend my plan by 2 hours”** once per rental — totally FREE.
+**If you think you need root, try this first:**
+* Ask an AI (like Claude or ChatGPT): *"How can I install [Tool Name] on Linux without sudo access?"*
+* Most tools can be compiled from source or downloaded as pre-compiled binaries into `~/bin`.
 
-⚠️ You can use this **only once**.
-
----
-
-## 💡 Quick Tips
-
-✔️ Create separate Byobu sessions per ROM
-✔️ Always run builds inside Byobu
-✔️ Set up Git cookies
-✔️ Track builds via dashboard
-✔️ Use ServerHive Drive for uploads
-✔️ Ask admin for missing packages
-✔️ Remember expiration cleanup
-✔️ Use the free 2-hour extension wisely
+### Requesting System Packages
+If a specific system-level dependency is missing, simply contact an admin:
+> "Hi, could you please install `libncurses5` via `sudo apt install`? It's required for my legacy build."
 
 ---
 
-## 🧭 Typical Workflow Summary
+## ⏳ Plan Expiration & Extensions
+To keep our high-performance storage clean, **data is automatically purged** upon plan expiration.
 
-```bash
-# 1. Create a session
-tmux or byobu # (ignore if you're already present in a tmux or byobu session)
-
-# 2. Configure git
-git config --global user.name "Your Name"
-git config --global user.email "your.email@example.com"
-
-# 3. Setup git cookies
-
-# 4. Init repo
-mkdir ~/rom-name && cd ~/rom-name
-repo init -u <manifest-url> -b <branch>
-
-# 5. Sync
-repo sync -c -j$(nproc --all) --force-sync
-
-# 6. Source env
-source build/envsetup.sh
-
-# 7. Build
-breakfast <device>
-brunch <device>
-```
+### The "Safety Net" Extension
+Need a bit more time to finish a sync or upload? You can extend any rental by **2 hours for FREE**.
+* This can be claimed once per rental via the dashboard.
+* Use it wisely when your build is at 95%!
 
 ---
 
-## 🆘 Support
-
-Need help? We’re always here! 💬
-
-* [ServerHive Group](t.me/ServerRentals)
-* [ServerHive Owner](t.me/Shra1V32)
+## 🆘 Support & Community
+Join our community for tips, tricks, and technical support.
+* 📢 **Telegram Group:** [t.me/ServerRentals](https://t.me/ServerRentals)
 
 ---
 
 ## 🎉 Happy Building!
-
-You're now ready to enjoy the full ServerHive experience.
-Build fast. Build clean. Build smart. 🐝🔥🚀
+You are now equipped with the power of ServerHive. Build faster, cleaner, and smarter. 🐝🔥🚀
