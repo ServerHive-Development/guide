@@ -235,28 +235,60 @@ To protect system stability and security across shared bare-metal nodes, **direc
 
 ### The 90/10 Rule: Installing Tools Without Root
 
-Over 90% of custom developer tools can be installed directly inside your home directory (`~`) without `sudo`:
+Over 90% of custom developer tools can be installed directly inside your home directory (`~`) without `sudo`. Here are copy-paste setups for the most common rootless ecosystems:
 
-* **Firmware Dumping (`DumprX`):**
-  Need to extract Android firmware without root or `fsck.erofs` errors? Use our official rootless fork of DumprX:
-  👉 [**ServerHive-Development/DumprX**](https://github.com/ServerHive-Development/DumprX)
-* **Custom Binaries (`fastboot`, `payload-dumper-go`, `rclone`, `gh`):**
-  Download the Linux x86_64 binary into `~/.local/bin` and ensure it is in your `PATH`:
-  ```bash
-  mkdir -p ~/.local/bin
-  export PATH="$HOME/.local/bin:$PATH"
-  # Persist across sessions:
-  echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
-  ```
-* **Python Packages & Scripts:**
-  Use `uv` or standard virtual environments (`venv`) instead of global `sudo pip`:
-  ```bash
-  python3 -m venv ~/venv
-  source ~/venv/bin/activate
-  pip install <package-name>
-  ```
-* **Node.js Tools:**
-  Use `nvm` (Node Version Manager) to install any Node version locally in `~/.nvm`.
+#### 1. Python & CLI Tools (`astral uv` / `venv`)
+[**Astral `uv`**](https://docs.astral.sh/uv/) is an ultra-fast, rootless Python package and environment manager that also lets you install standalone Python CLI tools globally in your user directory:
+```bash
+# Install uv into ~/.local/bin
+curl -LsSf https://astral.sh/uv/install.sh | sh
+source $HOME/.local/bin/env
+
+# Run or install standalone Python CLI tools (like git-filter-repo, DumprX deps, etc.)
+uv tool install <package-name>
+
+# Create & activate a fast virtual environment
+uv venv ~/venv && source ~/venv/bin/activate
+uv pip install <package-name>
+```
+*(Alternatively, with built-in Python: `python3 -m venv ~/venv && source ~/venv/bin/activate && pip install <package-name>`)*
+
+#### 2. Node.js & npm (`nvm` / `bun`)
+Use [**`nvm`**](https://github.com/nvm-sh/nvm) (Node Version Manager) to install Node.js and global `npm` packages inside `~/.nvm` without root permissions:
+```bash
+# Install nvm
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+
+# Load nvm into your current shell
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+# Install and use the latest LTS release of Node.js
+nvm install --lts
+```
+*(Need [**Bun**](https://bun.sh/) instead? Run `curl -fsSL https://bun.sh/install | bash`)*
+
+#### 3. Rust Toolchain & Cargo Binaries (`rustup`)
+Install Rust and compile/install CLI binaries locally in `~/.cargo/bin`:
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+source "$HOME/.cargo/env"
+```
+
+#### 4. Firmware Dumping (`DumprX`)
+Need to extract Android firmware without root or `fsck.erofs` errors? Use our official rootless fork of DumprX:
+```bash
+git clone https://github.com/ServerHive-Development/DumprX ~/DumprX
+cd ~/DumprX && bash setup.sh
+```
+
+#### 5. Custom Pre-Compiled Binaries (`~/.local/bin`)
+For standalone Linux x86_64 binaries (`rclone`, `payload-dumper-go`, `gh`, `jq`, etc.), drop them into `~/.local/bin` and add it to your `PATH`:
+```bash
+mkdir -p ~/.local/bin
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+```
 
 > [!TIP]
 > Not sure how to install a specific tool without `sudo`? Ask an AI assistant (Claude, ChatGPT, or Gemini):
