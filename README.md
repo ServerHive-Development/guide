@@ -1,59 +1,125 @@
-# 🐝 **ServerHive — Enterprise Bare-Metal Build Environment**
+<div align="center">
 
-Welcome to **ServerHive**! This guide provides the essential knowledge to maximize your productivity on our **enterprise-grade shared bare-metal build servers**. Designed specifically for high-performance Android and ROM development, ServerHive eliminates the bottlenecks of traditional virtualization. 🚀🐝
+# 🐝 ServerHive Developer Guide
 
----
+**Enterprise Bare-Metal Build Environment for High-Performance Android & ROM Development**
 
-## ⚡ The ServerHive Advantage
+[![Platform](https://img.shields.io/badge/Platform-Bare--Metal_Linux-F59E0B?style=flat-square&logo=linux&logoColor=white)](#-why-serverhive)
+[![Use Case](https://img.shields.io/badge/Optimized_For-AOSP_%26_Custom_ROMs-3DDC84?style=flat-square&logo=android&logoColor=white)](#-the-build-workflow)
+[![IDE](https://img.shields.io/badge/Web_IDE-CodeServer_(VS_Code)-007ACC?style=flat-square&logo=visualstudiocode&logoColor=white)](#-platform-features)
+[![Telegram](https://img.shields.io/badge/Community-@ServerRentals-26A5E4?style=flat-square&logo=telegram&logoColor=white)](https://t.me/ServerRentals)
 
-We provide **raw, native performance** on dedicated hardware. Unlike VPS instances, our bare-metal architecture ensures that every cycle of the CPU is dedicated to your build tasks, with no hypervisor overhead.
+[Getting Started](#-getting-started) •
+[Build Workflow](#-the-build-workflow) •
+[Persistent Sessions](#️-persistent-sessions-byobu--tmux) •
+[Debugging & Troubleshooting](#-debugging--troubleshooting) •
+[FAQ](#-frequently-asked-questions-faq) •
+[Support](#-support--community)
 
-### Why Bare-Metal?
-Virtual machines often suffer from "noisy neighbor" effects and I/O latency. Our environment is optimized for the intense multi-threaded workloads required for modern ROM compilation.
-
-> 💬 **Need a fully dedicated instance?** 
-> Private, non-shared servers are available upon request for enterprise users.
-
-🔒 **Security & Policy:** Our infrastructure is strictly monitored for compliance. We maintain a zero-tolerance policy for illegal or abusive usage to ensure a clean, high-speed ecosystem for all legitimate developers.
-
----
-
-## 🧰 Key Features
-
-* ⏸️ **Flexible Billing** – Pause and resume your plans to save your balance.
-* 📁 **ServerHive Drive** – High-speed, permanent storage for your assets.
-* 🖥️ **Integrated IDE** – Access a full CodeServer (VS Code) instance directly in your browser.
-* 📡 **Real-Time Monitoring** – Track build progress and system health through our dashboard.
-* 📱 **Mobile Management** – Use our Mini-App to manage your server on the go.
-* 💳 **Unified Wallet** – Seamless payments and automated balance management.
-* 🛡️ **Automated Verification** – AI-powered instant payment verifications for credits.
-* 📤 **Automated Deployment** – Auto-upload completed builds to Drive or GoFile.
+</div>
 
 ---
 
-## 🧩 Getting Started
+Welcome to **ServerHive**! Whether you are compiling your very first custom ROM or maintaining multiple device trees across Android releases, this guide covers everything you need to get the most out of your **enterprise-grade shared bare-metal build server**.
 
-Your SSH credentials will be delivered via your dashboard or admin once your environment is provisioned.
+## 📖 Table of Contents
 
-### Recommended SSH Clients
-* 📱 **Mobile:** [Termux](https://termux.dev/) (Android) or [Ish](https://ish.app/) (iOS)
-* 💻 **Desktop:** [Termius](https://termius.com/), [PuTTY](https://www.putty.org/), or your native system terminal.
+1. [⚡ Why ServerHive?](#-why-serverhive)
+2. [🧰 Platform Features](#-platform-features)
+3. [🚀 Getting Started](#-getting-started)
+4. [🔨 The Build Workflow](#-the-build-workflow)
+5. [🖥️ Persistent Sessions (Byobu & Tmux)](#️-persistent-sessions-byobu--tmux)
+6. [🗃️ Multi-ROM & Storage Management](#️-multi-rom--storage-management)
+7. [🔐 Root Access & Package Management](#-root-access--package-management)
+8. [⏳ Plan Lifecycle, Expiration & Extensions](#-plan-lifecycle-expiration--extensions)
+9. [🩺 Debugging & Troubleshooting](#-debugging--troubleshooting)
+10. [❓ Frequently Asked Questions (FAQ)](#-frequently-asked-questions-faq)
+11. [🧭 Quick Reference Cheat Sheet](#-quick-reference-cheat-sheet)
+12. [🆘 Support & Community](#-support--community)
 
-### Accessing Your Server
+---
+
+## ⚡ Why ServerHive?
+
+Android compilation (`soong`, `ninja`, `r8`, and `metalava`) is one of the most CPU-, RAM-, and I/O-intensive workloads in software engineering. Traditional Virtual Private Servers (VPS) suffer from hypervisor overhead, disk I/O throttling, and "noisy neighbor" slowdowns.
+
+ServerHive runs directly on **dedicated bare-metal hardware** so every core and NVMe read/write operation goes straight to your build:
+
+| Capability | Traditional Cloud VPS | ServerHive Bare-Metal |
+| :--- | :--- | :--- |
+| **CPU Execution** | Virtualized vCPUs with hypervisor tax | Raw, native physical cores & threads |
+| **Disk I/O** | Network-attached / throttled IOPS | High-speed local NVMe storage |
+| **Environment** | Blank OS requiring hours of setup | Pre-configured with 99% of Android build tools |
+| **Build Persistence** | Manual `tmux`/`screen` configuration | Automatic persistent Byobu sessions on login |
+| **Artifact Delivery** | Manual `scp`/`rsync` transfers | Automated uploads to ServerHive Drive / GoFile |
+
+> [!TIP]
+> **Need a fully isolated server?** Private, non-shared dedicated servers are available on request for teams and enterprise developers. Reach out via our [Telegram community](https://t.me/ServerRentals).
+
+> [!IMPORTANT]
+> **Fair Use & Compliance Policy:** Our infrastructure is strictly monitored to keep the ecosystem fast and reliable for everyone. We maintain a zero-tolerance policy for illegal, abusive, or non-development workloads (such as crypto mining, network scanning, or DDoS activity).
+
+---
+
+## 🧰 Platform Features
+
+| Feature | What It Does |
+| :--- | :--- |
+| ⏸️ **Flexible Billing** | Pause your active plan when you take a break and resume whenever you are ready—never waste unused hours. |
+| 📁 **ServerHive Drive** | High-speed, permanent cloud storage for preserving your completed ROM zips, boot images, and key assets. |
+| 🖥️ **Integrated Web IDE** | Edit device trees, inspect logs, and manage files right from your browser with a built-in **CodeServer (VS Code)** instance. |
+| 📡 **Real-Time Monitoring** | Track live CPU/RAM utilization, disk space, and build progress directly from your dashboard. |
+| 📱 **Mobile Mini-App** | Start, monitor, pause, or extend your server on the go from your smartphone. |
+| 💳 **Unified Wallet** | Manage credits with seamless payments and AI-powered instant payment verification. |
+| 📤 **Automated Deployment** | Automatically upload finished build artifacts to **ServerHive Drive** or **GoFile** as soon as compilation completes. |
+
+---
+
+## 🚀 Getting Started
+
+Once your environment is provisioned, your SSH credentials (`username`, `hostname`, `port`, and password) will be delivered via your dashboard or admin.
+
+### 1. Choose an SSH Client
+
+| Platform | Recommended Clients |
+| :--- | :--- |
+| **Desktop (Windows / macOS / Linux)** | Native Terminal (`OpenSSH`), [Termius](https://termius.com/), [PuTTY](https://www.putty.org/), or [Windows Terminal](https://aka.ms/terminal) |
+| **Android** | [Termux](https://termux.dev/) or [Termius](https://termius.com/) |
+| **iOS / iPadOS** | [Termius](https://termius.com/) or [iSH](https://ish.app/) |
+| **Browser** | **CodeServer** (built-in terminal available via your ServerHive dashboard) |
+
+### 2. Connect to Your Server
+
+Open your terminal and run:
+
 ```bash
 ssh username@server.serverhive.com -p 22
 ```
 
+*(Replace `username`, `server.serverhive.com`, and `22` with the exact credentials shown in your dashboard.)*
+
+> [!NOTE]
+> When typing your password in SSH, **no characters or asterisks (`*`) will appear on screen**. This is normal Linux security behavior—simply type or paste your password and press `Enter`.
+
 ---
 
-# 🔨 The Build Workflow
+## 🔨 The Build Workflow
 
-To maintain stability in a shared environment, all builds **must** be executed within a persistent session.
+Follow these steps in order to initialize, sync, and compile your ROM cleanly.
 
----
+```mermaid
+flowchart LR
+    A[1. Git Config] --> B[2. Git Cookies]
+    B --> C[3. repo init]
+    C --> D[4. repo sync]
+    D --> E[5. envsetup.sh]
+    E --> F[6. breakfast & brunch]
+```
 
-## 🔧 Step 1: Global Git Configuration
-Set up your identity before starting any repository operations.
+### 🔧 Step 1: Configure Your Git Identity
+
+Git requires a name and email before initializing `repo` manifests or applying patches. Run this once on your server:
+
 ```bash
 git config --global user.name "Your Name"
 git config --global user.email "your.email@example.com"
@@ -61,122 +127,465 @@ git config --global user.email "your.email@example.com"
 
 ---
 
-## 🍪 Step 2: Git Cookies (Performance Optimization)
-Google implements aggressive rate-limiting on unauthenticated high-concurrency syncs, often resulting in **429 Too Many Requests** errors. Using Git cookies is highly recommended to ensure reliable synchronization. ⚡
+### 🍪 Step 2: Set Up Git Cookies *(Highly Recommended)*
 
-### Benefits
-* Prevents sync-interrupting rate limits.
-* Reduces metadata overhead.
-* Improves checkout reliability for large manifests.
+Google aggressively rate-limits unauthenticated high-concurrency syncs from shared data center IPs, which causes `429 Too Many Requests` errors and stalled checkouts. Setting up Git cookies authenticates your requests with Google's servers.
 
-### Setup Instructions
-1. Visit [android.googlesource.com](https://android.googlesource.com/).
-2. Click **"Generate Password"**.
-3. Authenticate and follow the **"Configure Git"** instructions.
-4. Copy and execute the provided shell script in your terminal.
+**Why use Git Cookies?**
+* Eliminates `429 Too Many Requests` errors during `repo sync`.
+* Prevents corrupted or incomplete repository checkouts.
+* Significantly speeds up large manifest fetches.
+
+**How to configure:**
+1. Open [android.googlesource.com](https://android.googlesource.com/) in your browser and sign in with your Google account.
+2. Click **Generate Password** in the top navigation bar.
+3. Scroll to the **Configure Git** section and copy the provided bash script.
+4. Paste and run that script inside your ServerHive terminal.
+
+<details>
+<summary>💡 <b>What does the generated script look like? (Click to expand)</b></summary>
+
+The script from Google creates `~/.gitcookies` with restricted permissions and registers it globally with Git:
+
+```bash
+touch ~/.gitcookies
+chmod 0600 ~/.gitcookies
+git config --global http.cookiefile ~/.gitcookies
+
+tr , \\t <<\__END__ >>~/.gitcookies
+android.googlesource.com,FALSE,/,TRUE,2147483647,o,git-your.email=1//your-generated-token
+.googlesource.com,TRUE,/,TRUE,2147483647,o,git-your.email=1//your-generated-token
+__END__
+```
+
+If your cookie ever expires or you want to reset it:
+```bash
+git config --global --unset http.cookiefile
+rm -f ~/.gitcookies
+```
+</details>
 
 ---
 
-## 📁 Step 3: Initialize Repository
+### 📁 Step 3: Initialize the ROM Repository
+
+Create a dedicated directory for your ROM and initialize `repo`. Choose **either** a shallow clone (recommended for faster syncs and lower disk usage) or a full history clone:
+
 ```bash
 mkdir -p ~/lineageos && cd ~/lineageos
 
-# Standard initialization
-repo init -u https://github.com/LineageOS/android.git -b lineage-21.0 --git-lfs
+# Option A: Shallow clone (Recommended — faster sync, saves ~40% disk space)
+repo init -u https://github.com/LineageOS/android.git -b lineage-22.1 --git-lfs --depth=1
 
-# Shallow clone (Faster, saves space)
-repo init -u https://github.com/LineageOS/android.git -b lineage-21.0 --git-lfs --depth=1
+# Option B: Standard initialization (Full commit history)
+repo init -u https://github.com/LineageOS/android.git -b lineage-22.1 --git-lfs
 ```
 
 ---
 
-## 🔄 Step 4: Synchronize Source
-Use the following command for an optimized, high-speed sync:
+### 🔄 Step 4: Synchronize the Source Tree
+
+Use our optimized sync command to download only the current branch without unnecessary tags or clone bundles:
+
 ```bash
-repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags --optimized-fetch --prune
+repo sync -c --force-sync --no-clone-bundle --no-tags --optimized-fetch --prune
 ```
+
+> [!TIP]
+> **No need to pass `-j` flags!** Modern `repo`, `mka`, and `brunch` automatically detect and scale across optimal CPU threads on the server. Omitting manual `-j` counts avoids connection throttling during syncs and resource contention during builds.
+
+<details>
+<summary>🔍 <b>What do these flags do?</b></summary>
+
+| Flag | Purpose |
+| :--- | :--- |
+| `-c` (`--current-branch`) | Fetches only the manifest branch instead of all upstream branches. |
+| `--force-sync` | Overwrites existing git directories if the manifest remote/revision changed. |
+| `--no-clone-bundle` | Skips pre-packaged bundle downloads for faster direct git transfers. |
+| `--no-tags` | Avoids downloading thousands of historical git tags. |
+| `--optimized-fetch` | Fetches only fixed SHA-1 revisions when specified in the manifest. |
+| `--prune` | Removes obsolete refs that no longer exist upstream. |
+
+</details>
 
 ---
 
-## 📦 Step 5: Environment Setup
-⚠️ **Note:** Always source your environment in a clean shell session to avoid variable pollution.
+### 📦 Step 5: Set Up the Build Environment
+
+Load the Android build scripts and helper functions (`lunch`, `breakfast`, `brunch`, `mka`, `croot`):
+
 ```bash
 source build/envsetup.sh
 ```
 
+> [!WARNING]
+> Always run `source build/envsetup.sh` inside a **clean shell window** for each ROM. Never source two different ROM trees in the same shell window, or environment variables (`ANDROID_BUILD_TOP`, `OUT_DIR`, `PATH`) will collide.
+
 ---
 
-## 🏗️ Step 6: Execute Build
+### 🏗️ Step 6: Start the Build
+
+Select your target device and start compiling:
+
 ```bash
-# Select your device
+# 1. Configure your device target (downloads official device dependencies if supported)
 breakfast <device_codename>
 
-# Start compilation
+# 2. Compile the full flashable ROM package
 brunch <device_codename>
-# OR
-mka bacon
 ```
-🚫 **Pro Tip:** Avoid using generic `make`. Use `mka` or `brunch` for optimized resource allocation.
+
+**Alternative build commands (depending on your ROM's manifest):**
+
+```bash
+# Standard AOSP / custom ROM target selection + build
+lunch lineage_<device_codename>-ap3a-userdebug
+mka bacon        # LineageOS / CrDroid / most Lineage-based ROMs
+# OR
+mka otapackage   # Pure AOSP / PixelOS / AOSP-based ROMs
+```
+
+> [!IMPORTANT]
+> **Avoid plain `make` and manual `-j` flags:** Always use `mka` or `brunch` (which wraps `mka`) without specifying a `-j` thread count. They automatically schedule jobs across available CPU cores.
+
+Once completed, your flashable `.zip` and recovery images are located in:
+```text
+out/target/product/<device_codename>/
+```
 
 ---
 
-## 🖥️ Persistent Sessions (Byobu/Tmux)
+## 🖥️ Persistent Sessions (Byobu & Tmux)
 
-ServerHive uses **Byobu** as the default terminal multiplexer. When you login, you are automatically placed in a persistent session.
+ServerHive uses **Byobu** (backed by `tmux`) as the default terminal multiplexer. **As soon as you log in via SSH, you are automatically inside a persistent session.**
 
-### The Power of Persistence
-If your connection drops or you close your terminal, **your build continues to run**. You can reattach at any time from any device.
+### Why Persistence Matters
+If your Wi-Fi drops, your laptop goes to sleep, or you close your mobile SSH app mid-compile, **your build continues running uninterrupted on the server**. Log back in from any device and pick up right where you left off.
 
-### Essential Commands
-* **Detach:** `F6` or `Ctrl+a` then `d`
-* **New Window:** `F2`
-* **Navigate Windows:** `F3` (Previous) / `F4` (Next)
-* **Reattach:** Simply type `byobu` after logging back in.
+### Essential Shortcuts
+
+| Action | Desktop Keyboard | Termux (Android) | Command Alternative |
+| :--- | :--- | :--- | :--- |
+| **Create New Window** | <kbd>F2</kbd> | <kbd>Vol Up</kbd> + <kbd>2</kbd> | `byobu new-window` |
+| **Previous Window** | <kbd>F3</kbd> | <kbd>Vol Up</kbd> + <kbd>3</kbd> | `byobu previous-window` |
+| **Next Window** | <kbd>F4</kbd> | <kbd>Vol Up</kbd> + <kbd>4</kbd> | `byobu next-window` |
+| **Rename Current Window** | <kbd>F8</kbd> | <kbd>Vol Up</kbd> + <kbd>8</kbd> | `Ctrl+a` then `,` |
+| **Detach Safely (Keep Running)** | <kbd>F6</kbd> or <kbd>Ctrl</kbd>+<kbd>a</kbd> then <kbd>d</kbd> | <kbd>Vol Up</kbd> + <kbd>6</kbd> | `byobu detach` |
+| **Scroll / Copy Mode** | <kbd>F7</kbd> *(press <kbd>q</kbd> to exit)* | <kbd>Vol Up</kbd> + <kbd>7</kbd> | `byobu copy-mode` |
+| **Reattach After Login** | Automatic on login | Automatic on login | `byobu` or `byobu-select-session` |
+
+> [!CAUTION]
+> Typing `exit` or pressing <kbd>Ctrl</kbd>+<kbd>d</kbd> **closes and terminates** the current shell window! If you want to leave your build running in the background, always **detach** using <kbd>F6</kbd> (or simply close your SSH client).
 
 ---
 
-## 🗃️ Multi-ROM Management
-⚠️ **Constraint:** Never attempt to build two different ROMs within the same window or environment session. This will cause dependency conflicts.
+## 🗃️ Multi-ROM & Storage Management
 
-**Recommended Workflow:**
-1. Create a new Byobu window (`F2`).
-2. Navigate to your second ROM directory.
-3. Source the environment and start your build.
+You can maintain and build multiple ROM sources on the same account—just keep their shell environments isolated.
+
+### Rules for Multiple ROMs
+1. **One Window (or Session) Per ROM:** Never reuse a shell window where you already ran `source build/envsetup.sh` for another ROM.
+2. **Use Dedicated Directories:** Keep each ROM in its own top-level folder (`~/lineageos`, `~/crdroid`, `~/pixelos`).
+
+**Example Multi-ROM Setup:**
+
+```bash
+# Window 1 (press F2 to create, F8 to rename to "lineage")
+cd ~/lineageos
+source build/envsetup.sh
+brunch raven
+
+# Window 2 (press F2 to create a fresh window, F8 to rename to "crdroid")
+cd ~/crdroid
+source build/envsetup.sh
+brunch munch
+```
+
+### Managing Disk Space
+
+A single Android source tree + `out/` directory can consume **250 GB – 400 GB** of disk space. Check your usage anytime:
+
+```bash
+# Check overall disk free space
+df -h ~
+
+# Check how much space each folder in your home directory uses
+du -sh ~/* 2>/dev/null | sort -hr
+```
 
 ---
 
 ## 🔐 Root Access & Package Management
 
-Standard **root access is not provided** for security and stability reasons. However, our environment is pre-configured with 99% of the tools you will ever need for Android development.
+To protect system stability and security across shared bare-metal nodes, **direct `sudo` / `root` access is not provided**. However, our servers come pre-installed with 99% of the compilers, 32-bit/64-bit libraries, and utilities required for legacy and modern Android builds (`repo`, `git-lfs`, `bc`, `bison`, `flex`, `lz4`, `zstd`, `openjdk`, `python3`, etc.).
 
-### Developing Without Root (The 90/10 Rule)
-90% of development tasks on Linux **do not require root**. You can install local binaries, manage Python environments with `venv` or `uv`, and use Node.js via `nvm`—all within your home directory.
+### The 90/10 Rule: Installing Tools Without Root
 
-**If you think you need root, try this first:**
-* Ask an AI (like Claude or ChatGPT): *"How can I install [Tool Name] on Linux without sudo access?"*
-* Most tools can be compiled from source or downloaded as pre-compiled binaries into `~/bin`.
+Over 90% of custom developer tools can be installed directly inside your home directory (`~`) without `sudo`:
 
-### Requesting System Packages
-If a specific system-level dependency is missing, simply contact an admin:
-> "Hi, could you please install `libncurses5` via `sudo apt install`? It's required for my legacy build."
+* **Custom Binaries (`fastboot`, `payload-dumper-go`, `rclone`, `gh`):**
+  Download the Linux x86_64 binary into `~/.local/bin` and ensure it is in your `PATH`:
+  ```bash
+  mkdir -p ~/.local/bin
+  export PATH="$HOME/.local/bin:$PATH"
+  # Persist across sessions:
+  echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+  ```
+* **Python Packages & Scripts:**
+  Use `uv` or standard virtual environments (`venv`) instead of global `sudo pip`:
+  ```bash
+  python3 -m venv ~/venv
+  source ~/venv/bin/activate
+  pip install <package-name>
+  ```
+* **Node.js Tools:**
+  Use `nvm` (Node Version Manager) to install any Node version locally in `~/.nvm`.
+
+> [!TIP]
+> Not sure how to install a specific tool without `sudo`? Ask an AI assistant (Claude, ChatGPT, or Gemini):
+> *"How do I install `<tool-name>` locally in `~/.local/bin` on Ubuntu Linux without root/sudo access?"*
+
+### Requesting a System Package
+
+If your build requires a system-level shared library (e.g., `libncurses5` or a specific `apt` package), message an admin in our [Telegram group](https://t.me/ServerRentals):
+
+```text
+Hi Admin! Could you please install the following package on <server-name>?
+Command: sudo apt update && sudo apt install -y libncurses5
+Reason: Required by prebuilt clang in my Android 12 kernel build.
+```
 
 ---
 
-## ⏳ Plan Expiration & Extensions
-To keep our high-performance storage clean, **data is automatically purged** upon plan expiration.
+## ⏳ Plan Lifecycle, Expiration & Extensions
 
-### The "Safety Net" Extension
-Need a bit more time to finish a sync or upload? You can extend any rental by **2 hours for FREE**.
-* This can be claimed once per rental via the dashboard.
-* Use it wisely when your build is at 95%!
+### Automatic Data Purge on Expiration
+To maintain maximum NVMe performance and storage availability, **all workspace data is automatically purged when your rental plan expires**.
+
+* Always upload your completed builds, local manifests (`.repo/local_manifests`), and signing keys to **ServerHive Drive** or an external Git repo before your timer runs out.
+* If you need to step away for a few days, **Pause** your plan from the dashboard instead of letting it expire!
+
+### 🛟 The Free 2-Hour "Safety Net" Extension
+Is your build at 95% or uploading to Drive with only minutes left on your plan?
+* Every rental includes a **one-time, 2-hour FREE extension**.
+* Claim it directly from your **ServerHive Dashboard** before your plan expires.
+* Save it for emergencies when you just need a little extra time to finish a compile or upload!
+
+---
+
+## 🩺 Debugging & Troubleshooting
+
+Running into an error during sync or compilation? Here is how to diagnose and fix the most common Android build issues on ServerHive.
+
+### 1. Finding the Actual Build Error
+
+Because Android compiles thousands of targets in parallel, the real error message is often buried hundreds of lines above `ninja: build stopped: subcommand failed`.
+
+Run these commands in your ROM root directory to pinpoint the exact failure:
+
+```bash
+# Search the latest error log for explicit FAILED targets
+grep -n -C 5 "FAILED:" out/error.log
+
+# Search for compiler, linker, or Metalava errors
+grep -E "error:|fatal error:|undefined reference|Exception" out/error.log | tail -n 30
+
+# View the full compressed build log interactively
+zless out/verbose.log.gz
+```
+
+---
+
+### 2. Common Issues & Solutions
+
+<details open>
+<summary>🔴 <b>1. <code>error: RPC failed; HTTP 429 curl 22 The requested URL returned error: 429</code></b></summary>
+
+**Cause:** Google is rate-limiting your `repo sync` because Git cookies are missing or too many unauthenticated connections were opened at once.
+
+**Fix:**
+1. Follow [Step 2: Set Up Git Cookies](#-step-2-set-up-git-cookies-highly-recommended) to authenticate with `android.googlesource.com`.
+2. Re-run `repo sync` without specifying a high `-j` value:
+   ```bash
+   repo sync -c --force-sync --no-clone-bundle --no-tags --optimized-fetch --prune
+   ```
+</details>
+
+<details>
+<summary>🔴 <b>2. <code>Cannot remove project "...": uncommitted changes are present</code> during <code>repo sync</code></b></summary>
+
+**Cause:** Local edits or a previously interrupted sync left dirty files in a sub-repository.
+
+**Fix:**
+```bash
+# Discard uncommitted changes across all repositories
+repo forall -c 'git reset --hard && git clean -fdx'
+
+# If a specific repo path is corrupted, delete its folder and re-sync it:
+rm -rf path/to/broken/project
+repo sync path/to/broken/project
+```
+</details>
+
+<details>
+<summary>🔴 <b>3. Java OutOfMemoryError (<code>GC overhead limit exceeded</code> / <code>Java heap space</code>) or R8 / Metalava Crash</b></summary>
+
+**Cause:** Metalava, D8, or R8 exceeded the default JVM heap limit while processing framework stubs or system apps.
+
+**Fix:** Increase the Java heap allowance for Soong before starting your build:
+```bash
+export _JAVA_OPTIONS="-Xmx16g"
+# Or configure Soong's default Java args:
+export SOONG_JAVA_ARGS="-Xmx16g"
+mka bacon
+```
+</details>
+
+<details>
+<summary>🔴 <b>4. Build Killed with <code>signal 9 (SIGKILL)</code> or <code>collect2: fatal error: ld terminated with signal 9</code></b></summary>
+
+**Cause:** The Linux Out-Of-Memory (OOM) killer terminated a heavy C++/Rust linker process (such as `libwebviewchromium` or `clang++` LTO) when peak RAM spiked.
+
+**Fix:** Simply re-run your build command without passing custom high `-j` flags—`ninja` tracks completed targets and will resume right where it stopped:
+```bash
+mka bacon
+```
+</details>
+
+<details>
+<summary>🔴 <b>5. <code>No space left on device</code> during sync or build</b></summary>
+
+**Cause:** Your workspace reached its storage quota (often caused by old `out/` directories from previous builds or uncompressed `.repo` git packs).
+
+**Fix:**
+```bash
+# 1. Clean old build outputs (frees 100GB–200GB per ROM)
+mka clean
+
+# 2. Remove obsolete git objects from .repo
+repo forall -c 'git gc --prune=now'
+```
+</details>
+
+<details>
+<summary>🔴 <b>6. Dependency / SePolicy / Soong Namespace Conflicts After Changing Device Trees</b></summary>
+
+**Cause:** Old generated makefiles or blueprints in `out/soong` are conflicting with newly added/removed device tree repositories.
+
+**Fix:** Clean only the generated packaging and build config without wiping the entire `out/` directory:
+```bash
+# Fast clean: removes product staging & build ninja files, keeps compiled intermediates
+mka installclean
+
+# Full clean (use only if installclean doesn't resolve the issue)
+mka clean
+```
+</details>
+
+<details>
+<summary>🔴 <b>7. Git LFS Smudge Error / Corrupt Prebuilt Blobs (<code>not an ELF file</code> / <code>file too small</code>)</b></summary>
+
+**Cause:** Prebuilt vendor/GMS blobs tracked by `git-lfs` were checked out as tiny text pointer files instead of the actual binary files.
+
+**Fix:**
+```bash
+# Pull all LFS binaries across the entire repo manifest
+repo forall -c 'git lfs pull'
+```
+</details>
+
+---
+
+## ❓ Frequently Asked Questions (FAQ)
+
+<details>
+<summary><b>Q: What happens if my internet disconnects or I close my terminal while a build is running?</b></summary>
+
+**Nothing bad!** Because every SSH login opens inside a persistent **Byobu** session, your compilation keeps running on the server at full speed. When you reconnect via SSH, you will automatically reattach to your active session.
+</details>
+
+<details>
+<summary><b>Q: What is the difference between <code>mka installclean</code> and <code>mka clean</code>?</b></summary>
+
+* **`mka installclean`** takes only a few seconds. It deletes `out/target/product/<device>/system`, `vendor`, `product`, and packaged `.zip`/`.img` files while preserving compiled C++/Java intermediates. Use this when tweaking device configs, overlays, properties, or switching between `user`/`userdebug`.
+* **`mka clean`** deletes the entire `out/` directory (`rm -rf out/`). Use this only when upgrading Android major versions, fixing deep Soong corruptions, or freeing up disk space.
+</details>
+
+<details>
+<summary><b>Q: How do I upload my finished ROM build?</b></summary>
+
+You have several fast options:
+1. **Automated Deployment:** Use the **Auto-Upload** feature integrated into the ServerHive dashboard to push builds straight to **ServerHive Drive** or **GoFile**.
+2. **CLI Upload (GoFile / PixelDrain / Rclone):** Upload directly from the terminal using `curl` or `rclone`. For example, to upload a file to GoFile from your terminal:
+   ```bash
+   SERVER=$(curl -s https://api.gofile.io/servers | jq -r '.data.servers[0].name')
+   curl -F "file=@out/target/product/<device>/lineage-*.zip" "https://${SERVER}.gofile.io/contents/uploadfile" | jq
+   ```
+</details>
+
+<details>
+<summary><b>Q: Can I edit files graphically instead of using <code>nano</code> or <code>vim</code>?</b></summary>
+
+**Yes!** Every ServerHive plan includes **CodeServer** (VS Code in the browser). Open it from your ServerHive dashboard to browse directories, edit device trees with syntax highlighting, view diffs, and use integrated terminals.
+</details>
+
+<details>
+<summary><b>Q: Can I pause my plan overnight and continue my build tomorrow?</b></summary>
+
+**Yes!** With **Flexible Billing**, you can pause your active plan from the dashboard or Mini-App when you aren't using the server, and resume later without losing your balance or files. *(Note: Do not pause while a build is actively mid-compilation—wait for the build to finish or stop it cleanly with `Ctrl+C` first.)*
+</details>
+
+<details>
+<summary><b>Q: Why did my Byobu session open a clean shell instead of my running build?</b></summary>
+
+You may have multiple Byobu windows or sessions open!
+* Press <kbd>F3</kbd> or <kbd>F4</kbd> to cycle through your open windows (check the bottom status bar for window numbers `0:`, `1:`, `2:`).
+* Or run `byobu-select-session` to see if you created a second detached session.
+</details>
+
+<details>
+<summary><b>Q: Can I build kernels or recoveries (TWRP / OrangeFox) on ServerHive?</b></summary>
+
+**Absolutely!** Kernels and custom recoveries require only a fraction of the disk space and compile in minutes on our bare-metal CPUs. Just follow the same workflow: create a dedicated directory (`~/kernel` or `~/twrp`) and run it in its own Byobu window.
+</details>
+
+---
+
+## 🧭 Quick Reference Cheat Sheet
+
+Copy and paste this end-to-end workflow whenever setting up a fresh ROM workspace:
+
+```bash
+# 1. Set Git identity (once per server)
+git config --global user.name "Your Name"
+git config --global user.email "your.email@example.com"
+
+# 2. Create workspace & initialize shallow repo
+mkdir -p ~/rom && cd ~/rom
+repo init -u https://github.com/LineageOS/android.git -b lineage-22.1 --git-lfs --depth=1
+
+# 3. Sync source tree (ensure Git Cookies are set first!)
+repo sync -c --force-sync --no-clone-bundle --no-tags --optimized-fetch --prune
+
+# 4. Load build environment & compile
+source build/envsetup.sh
+breakfast <device_codename>
+brunch <device_codename>
+```
 
 ---
 
 ## 🆘 Support & Community
-Join our community for tips, tricks, and technical support.
-* 📢 **Telegram Group:** [t.me/ServerRentals](https://t.me/ServerRentals)
+
+Stuck on a tricky build error, need a system package installed, or want to connect with fellow ROM developers? We are here to help!
+
+* 📢 **Telegram Community & Support:** [t.me/ServerRentals](https://t.me/ServerRentals)
 
 ---
 
-## 🎉 Happy Building!
-You are now equipped with the power of ServerHive. Build faster, cleaner, and smarter. 🐝🔥🚀
+<div align="center">
+
+### 🎉 Happy Building!
+**Build faster. Build cleaner. Build smarter with ServerHive.** 🐝🔥🚀
+
+</div>
