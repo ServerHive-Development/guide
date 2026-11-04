@@ -5,12 +5,12 @@
 **Enterprise Bare-Metal Build Environment for High-Performance Android & ROM Development**
 
 [![Platform](https://img.shields.io/badge/Platform-Bare--Metal_Linux-F59E0B?style=flat-square&logo=linux&logoColor=white)](#-why-serverhive)
-[![Use Case](https://img.shields.io/badge/Optimized_For-AOSP_%26_Custom_ROMs-3DDC84?style=flat-square&logo=android&logoColor=white)](#-the-build-workflow)
+[![Use Case](https://img.shields.io/badge/Optimized_For-AOSP_%26_Custom_ROMs-3DDC84?style=flat-square&logo=android&logoColor=white)](#-pre-build-setup--guidelines)
 [![IDE](https://img.shields.io/badge/Web_IDE-CodeServer_(VS_Code)-007ACC?style=flat-square&logo=visualstudiocode&logoColor=white)](#-platform-features)
 [![Telegram](https://img.shields.io/badge/Community-@ServerRentals-26A5E4?style=flat-square&logo=telegram&logoColor=white)](https://t.me/ServerRentals)
 
 [Getting Started](#-getting-started) •
-[Build Workflow](#-the-build-workflow) •
+[Pre-Build Setup](#-pre-build-setup--guidelines) •
 [Persistent Sessions](#️-persistent-sessions-byobu--tmux) •
 [Debugging & Troubleshooting](#-debugging--troubleshooting) •
 [FAQ](#-frequently-asked-questions-faq) •
@@ -27,15 +27,14 @@ Welcome to **ServerHive**! Whether you are compiling your very first custom ROM 
 1. [⚡ Why ServerHive?](#-why-serverhive)
 2. [🧰 Platform Features](#-platform-features)
 3. [🚀 Getting Started](#-getting-started)
-4. [🔨 The Build Workflow](#-the-build-workflow)
+4. [🔨 Pre-Build Setup & Guidelines](#-pre-build-setup--guidelines)
 5. [🖥️ Persistent Sessions (Byobu & Tmux)](#️-persistent-sessions-byobu--tmux)
 6. [🗃️ Multi-ROM & Storage Management](#️-multi-rom--storage-management)
 7. [🔐 Root Access & Package Management](#-root-access--package-management)
 8. [⏳ Plan Lifecycle, Expiration & Extensions](#-plan-lifecycle-expiration--extensions)
 9. [🩺 Debugging & Troubleshooting](#-debugging--troubleshooting)
 10. [❓ Frequently Asked Questions (FAQ)](#-frequently-asked-questions-faq)
-11. [🧭 Quick Reference Cheat Sheet](#-quick-reference-cheat-sheet)
-12. [🆘 Support & Community](#-support--community)
+11. [🆘 Support & Community](#-support--community)
 
 ---
 
@@ -103,22 +102,11 @@ ssh username@server.serverhive.com -p 22
 
 ---
 
-## 🔨 The Build Workflow
+## 🔨 Pre-Build Setup & Guidelines
 
-Follow these steps in order to initialize, sync, and compile your ROM cleanly.
+Before initializing and syncing your ROM manifest, configure your Git identity and authentication cookies once per server.
 
-```mermaid
-flowchart LR
-    A[1. Git Config] --> B[2. Git Cookies]
-    B --> C[3. repo init]
-    C --> D[4. repo sync]
-    D --> E[5. envsetup.sh]
-    E --> F[6. breakfast & brunch]
-```
-
-### 🔧 Step 1: Configure Your Git Identity
-
-Git requires a name and email before initializing `repo` manifests or applying patches. Run this once on your server:
+### 🔧 1. Configure Your Git Identity
 
 ```bash
 git config --global user.name "Your Name"
@@ -127,131 +115,22 @@ git config --global user.email "your.email@example.com"
 
 ---
 
-### 🍪 Step 2: Set Up Git Cookies *(Highly Recommended)*
+### 🍪 2. Set Up Git Cookies *(Highly Recommended)*
 
-Google aggressively rate-limits unauthenticated high-concurrency syncs from shared data center IPs, which causes `429 Too Many Requests` errors and stalled checkouts. Setting up Git cookies authenticates your requests with Google's servers.
-
-**Why use Git Cookies?**
-* Eliminates `429 Too Many Requests` errors during `repo sync`.
-* Prevents corrupted or incomplete repository checkouts.
-* Significantly speeds up large manifest fetches.
+Google aggressively rate-limits unauthenticated syncs from shared data center IPs, causing `429 Too Many Requests` errors and stalled checkouts. Setting up Git cookies authenticates your requests with Google's servers.
 
 **How to configure:**
 1. Open [android.googlesource.com](https://android.googlesource.com/) in your browser and sign in with your Google account.
 2. Click **Generate Password** in the top navigation bar.
-3. Scroll to the **Configure Git** section and copy the provided bash script.
-4. Paste and run that script inside your ServerHive terminal.
-
-<details>
-<summary>💡 <b>What does the generated script look like? (Click to expand)</b></summary>
-
-The script from Google creates `~/.gitcookies` with restricted permissions and registers it globally with Git:
-
-```bash
-touch ~/.gitcookies
-chmod 0600 ~/.gitcookies
-git config --global http.cookiefile ~/.gitcookies
-
-tr , \\t <<\__END__ >>~/.gitcookies
-android.googlesource.com,FALSE,/,TRUE,2147483647,o,git-your.email=1//your-generated-token
-.googlesource.com,TRUE,/,TRUE,2147483647,o,git-your.email=1//your-generated-token
-__END__
-```
-
-If your cookie ever expires or you want to reset it:
-```bash
-git config --global --unset http.cookiefile
-rm -f ~/.gitcookies
-```
-</details>
+3. Scroll to **Configure Git**, copy the provided bash script, and run it in your ServerHive terminal.
 
 ---
 
-### 📁 Step 3: Initialize the ROM Repository
+### ⚡ 3. ServerHive Build Best Practices
 
-Create a dedicated directory for your ROM and initialize `repo`. Choose **either** a shallow clone (recommended for faster syncs and lower disk usage) or a full history clone:
-
-```bash
-mkdir -p ~/lineageos && cd ~/lineageos
-
-# Option A: Shallow clone (Recommended — faster sync, saves ~40% disk space)
-repo init -u https://github.com/LineageOS/android.git -b lineage-22.1 --git-lfs --depth=1
-
-# Option B: Standard initialization (Full commit history)
-repo init -u https://github.com/LineageOS/android.git -b lineage-22.1 --git-lfs
-```
-
----
-
-### 🔄 Step 4: Synchronize the Source Tree
-
-Use our optimized sync command to download only the current branch without unnecessary tags or clone bundles:
-
-```bash
-repo sync -c --force-sync --no-clone-bundle --no-tags --optimized-fetch --prune
-```
-
-> [!TIP]
-> **No need to pass `-j` flags!** Modern `repo`, `mka`, and `brunch` automatically detect and scale across optimal CPU threads on the server. Omitting manual `-j` counts avoids connection throttling during syncs and resource contention during builds.
-
-<details>
-<summary>🔍 <b>What do these flags do?</b></summary>
-
-| Flag | Purpose |
-| :--- | :--- |
-| `-c` (`--current-branch`) | Fetches only the manifest branch instead of all upstream branches. |
-| `--force-sync` | Overwrites existing git directories if the manifest remote/revision changed. |
-| `--no-clone-bundle` | Skips pre-packaged bundle downloads for faster direct git transfers. |
-| `--no-tags` | Avoids downloading thousands of historical git tags. |
-| `--optimized-fetch` | Fetches only fixed SHA-1 revisions when specified in the manifest. |
-| `--prune` | Removes obsolete refs that no longer exist upstream. |
-
-</details>
-
----
-
-### 📦 Step 5: Set Up the Build Environment
-
-Load the Android build scripts and helper functions (`lunch`, `breakfast`, `brunch`, `mka`, `croot`):
-
-```bash
-source build/envsetup.sh
-```
-
-> [!WARNING]
-> Always run `source build/envsetup.sh` inside a **clean shell window** for each ROM. Never source two different ROM trees in the same shell window, or environment variables (`ANDROID_BUILD_TOP`, `OUT_DIR`, `PATH`) will collide.
-
----
-
-### 🏗️ Step 6: Start the Build
-
-Select your target device and start compiling:
-
-```bash
-# 1. Configure your device target (downloads official device dependencies if supported)
-breakfast <device_codename>
-
-# 2. Compile the full flashable ROM package
-brunch <device_codename>
-```
-
-**Alternative build commands (depending on your ROM's manifest):**
-
-```bash
-# Standard AOSP / custom ROM target selection + build
-lunch lineage_<device_codename>-ap3a-userdebug
-mka bacon        # LineageOS / CrDroid / most Lineage-based ROMs
-# OR
-mka otapackage   # Pure AOSP / PixelOS / AOSP-based ROMs
-```
-
-> [!IMPORTANT]
-> **Avoid plain `make` and manual `-j` flags:** Always use `mka` or `brunch` (which wraps `mka`) without specifying a `-j` thread count. They automatically schedule jobs across available CPU cores.
-
-Once completed, your flashable `.zip` and recovery images are located in:
-```text
-out/target/product/<device_codename>/
-```
+* **Do Not Pass `-j` Flags:** You do not need to specify `-j` thread counts during `repo sync`, `mka`, or `brunch`. The build tools automatically detect and scale across available CPU threads.
+* **Avoid Plain `make`:** Always use `mka` or `brunch` for optimized resource allocation.
+* **Clean Shell Per ROM:** Always run `source build/envsetup.sh` in a fresh shell window so environment variables do not collide across different trees.
 
 ---
 
@@ -404,11 +283,8 @@ zless out/verbose.log.gz
 **Cause:** Google is rate-limiting your `repo sync` because Git cookies are missing or too many unauthenticated connections were opened at once.
 
 **Fix:**
-1. Follow [Step 2: Set Up Git Cookies](#-step-2-set-up-git-cookies-highly-recommended) to authenticate with `android.googlesource.com`.
-2. Re-run `repo sync` without specifying a high `-j` value:
-   ```bash
-   repo sync -c --force-sync --no-clone-bundle --no-tags --optimized-fetch --prune
-   ```
+1. Follow [Set Up Git Cookies](#-2-set-up-git-cookies-highly-recommended) to authenticate with `android.googlesource.com`.
+2. Re-run `repo sync` without specifying a `-j` flag.
 </details>
 
 <details>
@@ -548,30 +424,6 @@ You may have multiple Byobu windows or sessions open!
 
 **Absolutely!** Kernels and custom recoveries require only a fraction of the disk space and compile in minutes on our bare-metal CPUs. Just follow the same workflow: create a dedicated directory (`~/kernel` or `~/twrp`) and run it in its own Byobu window.
 </details>
-
----
-
-## 🧭 Quick Reference Cheat Sheet
-
-Copy and paste this end-to-end workflow whenever setting up a fresh ROM workspace:
-
-```bash
-# 1. Set Git identity (once per server)
-git config --global user.name "Your Name"
-git config --global user.email "your.email@example.com"
-
-# 2. Create workspace & initialize shallow repo
-mkdir -p ~/rom && cd ~/rom
-repo init -u https://github.com/LineageOS/android.git -b lineage-22.1 --git-lfs --depth=1
-
-# 3. Sync source tree (ensure Git Cookies are set first!)
-repo sync -c --force-sync --no-clone-bundle --no-tags --optimized-fetch --prune
-
-# 4. Load build environment & compile
-source build/envsetup.sh
-breakfast <device_codename>
-brunch <device_codename>
-```
 
 ---
 
