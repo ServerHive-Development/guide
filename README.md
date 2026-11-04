@@ -82,8 +82,8 @@ Both Indian and international users are eligible for **automated payment verific
 
 | Payment Type | Supported Methods | Processing Time |
 | :--- | :--- | :--- |
-| ⚡ **Automated (Instant)** | • 🇮🇳 **UPI** (India)<br>• 🌍 **GitHub Sponsors** (International) | Credited immediately; rent servers right away |
-| 🛠️ **Manual (Admin Verified)** | • ₿ **Binance** (Crypto)<br>• 🌐 **Sociabuzz**<br>• 💲 **PayPal** *(charges apply)* | Credited after admin verification |
+| ⚡ **Automated (Instant)** | • 🇮🇳 **UPI** (India)<br>• 🌍 **DodoPayments** (Global)<br>• 🌍 **GitHub Sponsors** (International)<br>• 🌐 **Sociabuzz**<br>• 💲 **PayPal** *(charges apply)* | Credited immediately; rent servers right away |
+| 🛠️ **Manual (Admin Verified)** | • ₿ **Binance** (Crypto) | Credited after admin verification |
 
 ---
 
