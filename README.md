@@ -26,15 +26,17 @@ Welcome to **ServerHive**! Whether you are compiling your very first custom ROM 
 
 1. [⚡ Why ServerHive?](#-why-serverhive)
 2. [🧰 Platform Features](#-platform-features)
-3. [🚀 Getting Started](#-getting-started)
-4. [🔨 Pre-Build Setup & Guidelines](#-pre-build-setup--guidelines)
-5. [🖥️ Persistent Sessions (Byobu & Tmux)](#️-persistent-sessions-byobu--tmux)
-6. [🗃️ Multi-ROM & Storage Management](#️-multi-rom--storage-management)
-7. [🔐 Root Access & Package Management](#-root-access--package-management)
-8. [⏳ Plan Lifecycle, Expiration & Extensions](#-plan-lifecycle-expiration--extensions)
-9. [🩺 Debugging & Troubleshooting](#-debugging--troubleshooting)
-10. [❓ Frequently Asked Questions (FAQ)](#-frequently-asked-questions-faq)
-11. [🆘 Support & Community](#-support--community)
+3. [💳 Payments & Wallet Verification](#-payments--wallet-verification)
+4. [📜 Terms of Service & Supported Workloads](#-terms-of-service--supported-workloads)
+5. [🚀 Getting Started](#-getting-started)
+6. [🔨 Pre-Build Setup & Guidelines](#-pre-build-setup--guidelines)
+7. [🖥️ Persistent Sessions (Byobu & Tmux)](#️-persistent-sessions-byobu--tmux)
+8. [🗃️ Multi-ROM Management](#️-multi-rom-management)
+9. [🔐 Root Access & Package Management](#-root-access--package-management)
+10. [⏳ Plan Lifecycle, Expiration & Extensions](#-plan-lifecycle-expiration--extensions)
+11. [🩺 Debugging & Troubleshooting](#-debugging--troubleshooting)
+12. [❓ Frequently Asked Questions (FAQ)](#-frequently-asked-questions-faq)
+13. [🆘 Support & Community](#-support--community)
 
 ---
 
@@ -55,8 +57,8 @@ ServerHive runs directly on **dedicated bare-metal hardware** so every core and 
 > [!TIP]
 > **Need a fully isolated server?** Private, non-shared dedicated servers are available on request for teams and enterprise developers. Reach out via our [Telegram community](https://t.me/ServerRentals).
 
-> [!IMPORTANT]
-> **Fair Use & Compliance Policy:** Our infrastructure is strictly monitored to keep the ecosystem fast and reliable for everyone. We maintain a zero-tolerance policy for illegal, abusive, or non-development workloads (such as crypto mining, network scanning, or DDoS activity).
+> [!NOTE]
+> **Peak Hours & Performance:** Server load is typically higher during **weekends** and **nighttime in Indian Standard Time (IST)** when the majority of users start builds. For the fastest compile times, consider scheduling your builds during off-peak hours whenever possible.
 
 ---
 
@@ -71,6 +73,30 @@ ServerHive runs directly on **dedicated bare-metal hardware** so every core and 
 | 📱 **Mobile Mini-App** | Start, monitor, pause, or extend your server on the go from your smartphone. |
 | 💳 **Unified Wallet** | Manage credits with seamless payments and AI-powered instant payment verification. |
 | 📤 **Automated Deployment** | Automatically upload finished build artifacts to **ServerHive Drive** or **GoFile** as soon as compilation completes. |
+
+---
+
+## 💳 Payments & Wallet Verification
+
+Both Indian and international users are eligible for **automated payment verification** through the [ServerHive Wallet](http://t.me/ServerHive_bot?start=wallet), allowing you to top up and rent servers instantly without waiting for an admin.
+
+| Payment Type | Supported Methods | Processing Time |
+| :--- | :--- | :--- |
+| ⚡ **Automated (Instant)** | • 🇮🇳 **UPI** (India)<br>• 🌍 **GitHub Sponsors** (International) | Credited immediately; rent servers right away |
+| 🛠️ **Manual (Admin Verified)** | • ₿ **Binance** (Crypto)<br>• 🌐 **Sociabuzz**<br>• 💲 **PayPal** *(charges apply)* | Credited after admin verification |
+
+---
+
+## 📜 Terms of Service & Supported Workloads
+
+ServerHive servers are shared compute resources designed **exclusively for AOSP development and building workloads**.
+
+| ✅ Supported Workloads | 🚫 Unsupported Workloads (Strictly Prohibited) |
+| :--- | :--- |
+| • AOSP builds and compilation<br>• Building and compiling Android ROMs, kernels, and recoveries<br>• Firmware extraction (e.g., DumprX) and other tasks directly required for AOSP development | • Cryptocurrency mining<br>• AI/ML workloads, model inference, or training<br>• General-purpose compute workloads<br>• File hosting, mirroring, or distribution<br>• Piracy or unlawful content<br>• Any activity that negatively impacts shared server resources |
+
+> [!WARNING]
+> **Enforcement:** ServerHive reserves the right to terminate workloads or suspend access when servers are used for unsupported purposes or when usage negatively affects other users.
 
 ---
 
@@ -99,6 +125,14 @@ ssh username@server.serverhive.com -p 22
 
 > [!NOTE]
 > When typing your password in SSH, **no characters or asterisks (`*`) will appear on screen**. This is normal Linux security behavior—simply type or paste your password and press `Enter`.
+
+
+### 3. Seamless Passwordless SSH (SSH Keys)
+
+Skip typing passwords on every login by adding your public SSH key once—it will automatically apply to all your rentals:
+1. Open the [ServerHive Bot](http://t.me/ServerHive_bot?start=wallet) and run `/wallet`.
+2. Select **SSH Keys** and add your public key (`~/.ssh/id_ed25519.pub` or `~/.ssh/id_rsa.pub`).
+3. Connect to any new or active rental automatically without a password prompt!
 
 ---
 
@@ -156,9 +190,22 @@ If your Wi-Fi drops, your laptop goes to sleep, or you close your mobile SSH app
 > [!CAUTION]
 > Typing `exit` or pressing <kbd>Ctrl</kbd>+<kbd>d</kbd> **closes and terminates** the current shell window! If you want to leave your build running in the background, always **detach** using <kbd>F6</kbd> (or simply close your SSH client).
 
+
+### Unsticking or Disabling Byobu
+
+* **Stuck inside a frozen terminal?** Press <kbd>F2</kbd> (or <kbd>Ctrl</kbd>+<kbd>a</kbd> then <kbd>c</kbd>) to open a fresh window, or terminate all your hung user processes cleanly with:
+  ```bash
+  pkill -u -TERM $USER
+  ```
+* **Prefer plain SSH without auto-launching Byobu?** You can disable automatic Byobu startup at any time:
+  ```bash
+  touch $HOME/.disable-byobu
+  # Run rm $HOME/.disable-byobu if you ever want to re-enable it
+  ```
+
 ---
 
-## 🗃️ Multi-ROM & Storage Management
+## 🗃️ Multi-ROM Management
 
 You can maintain and build multiple ROM sources on the same account—just keep their shell environments isolated.
 
@@ -180,18 +227,6 @@ source build/envsetup.sh
 brunch munch
 ```
 
-### Managing Disk Space
-
-A single Android source tree + `out/` directory can consume **250 GB – 400 GB** of disk space. Check your usage anytime:
-
-```bash
-# Check overall disk free space
-df -h ~
-
-# Check how much space each folder in your home directory uses
-du -sh ~/* 2>/dev/null | sort -hr
-```
-
 ---
 
 ## 🔐 Root Access & Package Management
@@ -202,6 +237,9 @@ To protect system stability and security across shared bare-metal nodes, **direc
 
 Over 90% of custom developer tools can be installed directly inside your home directory (`~`) without `sudo`:
 
+* **Firmware Dumping (`DumprX`):**
+  Need to extract Android firmware without root or `fsck.erofs` errors? Use our official rootless fork of DumprX:
+  👉 [**ServerHive-Development/DumprX**](https://github.com/ServerHive-Development/DumprX)
 * **Custom Binaries (`fastboot`, `payload-dumper-go`, `rclone`, `gh`):**
   Download the Linux x86_64 binary into `~/.local/bin` and ensure it is in your `PATH`:
   ```bash
@@ -314,6 +352,19 @@ repo forall -c 'git lfs pull'
 ```
 </details>
 
+<details>
+<summary>🔴 <b>4. Terminal Session Frozen or Unresponsive</b></summary>
+
+**Cause:** A runaway process or hung shell is blocking your current Byobu window.
+
+**Fix:**
+1. Press <kbd>F2</kbd> or <kbd>Ctrl</kbd>+<kbd>a</kbd> then <kbd>c</kbd> to open a new Byobu window.
+2. Reset all processes belonging to your user account:
+   ```bash
+   pkill -u -TERM $USER
+   ```
+</details>
+
 ---
 
 ## ❓ Frequently Asked Questions (FAQ)
@@ -367,6 +418,30 @@ You may have multiple Byobu windows or sessions open!
 <summary><b>Q: Can I build kernels or recoveries (TWRP / OrangeFox) on ServerHive?</b></summary>
 
 **Absolutely!** Kernels and custom recoveries require only a fraction of the disk space and compile in minutes on our bare-metal CPUs. Just follow the same workflow: create a dedicated directory (`~/kernel` or `~/twrp`) and run it in its own Byobu window.
+</details>
+
+<details>
+<summary><b>Q: Why is my build taking longer than usual today?</b></summary>
+
+Server utilization is highest during **weekends** and **nighttime in IST (Indian Standard Time)** when most developers run builds simultaneously. Scheduling heavy builds during off-peak hours will give you the fastest turnaround times.
+</details>
+
+<details>
+<summary><b>Q: How can I dump firmware on the server without root access?</b></summary>
+
+Use our official rootless fork [**ServerHive-Development/DumprX**](https://github.com/ServerHive-Development/DumprX), which is pre-configured to work without `sudo` and resolves common `fsck.erofs` extraction errors.
+</details>
+
+<details>
+<summary><b>Q: Can I disable Byobu from starting automatically on SSH login?</b></summary>
+
+Yes! Run `touch $HOME/.disable-byobu` in your terminal. To re-enable it later, just delete that file (`rm $HOME/.disable-byobu`).
+</details>
+
+<details>
+<summary><b>Q: How do I set up passwordless SSH login?</b></summary>
+
+You can configure your SSH public keys directly in the price bot via `/wallet` → **SSH Keys** ([t.me/ServerHive_bot](http://t.me/ServerHive_bot?start=wallet)). Once added, your keys are automatically provisioned across all your rentals.
 </details>
 
 ---
