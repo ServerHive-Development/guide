@@ -179,7 +179,7 @@ If your Wi-Fi drops, your laptop goes to sleep, or you close your mobile SSH app
 
 | Action | Desktop Keyboard | Termux (Android) | Command Alternative |
 | :--- | :--- | :--- | :--- |
-| **Create New Window** | <kbd>F2</kbd> | <kbd>Vol Up</kbd> + <kbd>2</kbd> | `byobu new-window` |
+| **Create New Window** | <kbd>F2</kbd> or <kbd>Ctrl</kbd>+<kbd>a</kbd> then <kbd>c</kbd> | <kbd>Vol Up</kbd> + <kbd>2</kbd> | `byobu new-window` |
 | **Previous Window** | <kbd>F3</kbd> | <kbd>Vol Up</kbd> + <kbd>3</kbd> | `byobu previous-window` |
 | **Next Window** | <kbd>F4</kbd> | <kbd>Vol Up</kbd> + <kbd>4</kbd> | `byobu next-window` |
 | **Rename Current Window** | <kbd>F8</kbd> | <kbd>Vol Up</kbd> + <kbd>8</kbd> | `Ctrl+a` then `,` |
@@ -191,12 +191,14 @@ If your Wi-Fi drops, your laptop goes to sleep, or you close your mobile SSH app
 > Typing `exit` or pressing <kbd>Ctrl</kbd>+<kbd>d</kbd> **closes and terminates** the current shell window! If you want to leave your build running in the background, always **detach** using <kbd>F6</kbd> (or simply close your SSH client).
 
 
-### Unsticking or Disabling Byobu
+### Restarting a Stuck Session or Disabling Byobu
 
-* **Stuck inside a frozen terminal?** Press <kbd>F2</kbd> (or <kbd>Ctrl</kbd>+<kbd>a</kbd> then <kbd>c</kbd>) to open a fresh window, or terminate all your hung user processes cleanly with:
-  ```bash
-  pkill -u -TERM $USER
-  ```
+* **Stuck inside a terminal?**
+  1. If you're inside a Byobu terminal, press <kbd>F2</kbd> or <kbd>Ctrl</kbd>+<kbd>a</kbd> then <kbd>c</kbd> to create a new terminal window.
+  2. Run the following command to kill all processes related to your user:
+     ```bash
+     pkill -u -TERM $USER
+     ```
 * **Prefer plain SSH without auto-launching Byobu?** You can disable automatic Byobu startup at any time:
   ```bash
   touch $HOME/.disable-byobu
@@ -388,17 +390,24 @@ repo forall -c 'git lfs pull'
 </details>
 
 <details>
-<summary>🔴 <b>4. Terminal Session Frozen or Unresponsive</b></summary>
+<summary>🔴 <b>4. Stuck Inside a Terminal / Unresponsive Session</b></summary>
 
-**Cause:** A runaway process or hung shell is blocking your current Byobu window.
+**Cause:** A runaway process or hung shell is blocking your current terminal window.
 
 **Fix:**
-1. Press <kbd>F2</kbd> or <kbd>Ctrl</kbd>+<kbd>a</kbd> then <kbd>c</kbd> to open a new Byobu window.
-2. Reset all processes belonging to your user account:
+1. If you're inside a Byobu terminal, press <kbd>F2</kbd> or <kbd>Ctrl</kbd>+<kbd>a</kbd> then <kbd>c</kbd> to create a new terminal window.
+2. Run the following command to kill all processes related to your user:
    ```bash
    pkill -u -TERM $USER
    ```
 </details>
+
+> [!TIP]
+> **Encountering a different build or terminal error?** Launch an AI assistant in a new tab pre-filled with a ServerHive AOSP debugging prompt—just paste your error log and send:
+>
+> <a href="https://chatgpt.com/?q=I%20am%20building%20an%20Android%20AOSP%20ROM%20on%20an%20Ubuntu%20Linux%20server%20(without%20root%2Fsudo)%20and%20encountered%20the%20following%20error.%20Explain%20the%20root%20cause%20and%20give%20me%20exact%20commands%20to%20fix%20it%3A%0A%0A%5BPASTE_ERROR_LOG_HERE%5D" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/badge/Debug_with_ChatGPT-10A37F?style=for-the-badge&logo=openai&logoColor=white" alt="Debug with ChatGPT"></a>
+> <a href="https://claude.ai/new?q=I%20am%20building%20an%20Android%20AOSP%20ROM%20on%20an%20Ubuntu%20Linux%20server%20(without%20root%2Fsudo)%20and%20encountered%20the%20following%20error.%20Explain%20the%20root%20cause%20and%20give%20me%20exact%20commands%20to%20fix%20it%3A%0A%0A%5BPASTE_ERROR_LOG_HERE%5D" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/badge/Debug_with_Claude-D97757?style=for-the-badge&logo=claude&logoColor=white" alt="Debug with Claude"></a>
+> <a href="https://www.perplexity.ai/search?q=I%20am%20building%20an%20Android%20AOSP%20ROM%20on%20an%20Ubuntu%20Linux%20server%20(without%20root%2Fsudo)%20and%20encountered%20the%20following%20error.%20Explain%20the%20root%20cause%20and%20give%20me%20exact%20commands%20to%20fix%20it%3A%0A%0A%5BPASTE_ERROR_LOG_HERE%5D" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/badge/Debug_with_Perplexity-20808D?style=for-the-badge&logo=perplexity&logoColor=white" alt="Debug with Perplexity"></a>
 
 ---
 
