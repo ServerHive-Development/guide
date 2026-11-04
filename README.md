@@ -288,63 +288,7 @@ zless out/verbose.log.gz
 </details>
 
 <details>
-<summary>🔴 <b>2. <code>Cannot remove project "...": uncommitted changes are present</code> during <code>repo sync</code></b></summary>
-
-**Cause:** Local edits or a previously interrupted sync left dirty files in a sub-repository.
-
-**Fix:**
-```bash
-# Discard uncommitted changes across all repositories
-repo forall -c 'git reset --hard && git clean -fdx'
-
-# If a specific repo path is corrupted, delete its folder and re-sync it:
-rm -rf path/to/broken/project
-repo sync path/to/broken/project
-```
-</details>
-
-<details>
-<summary>🔴 <b>3. Java OutOfMemoryError (<code>GC overhead limit exceeded</code> / <code>Java heap space</code>) or R8 / Metalava Crash</b></summary>
-
-**Cause:** Metalava, D8, or R8 exceeded the default JVM heap limit while processing framework stubs or system apps.
-
-**Fix:** Increase the Java heap allowance for Soong before starting your build:
-```bash
-export _JAVA_OPTIONS="-Xmx16g"
-# Or configure Soong's default Java args:
-export SOONG_JAVA_ARGS="-Xmx16g"
-mka bacon
-```
-</details>
-
-<details>
-<summary>🔴 <b>4. Build Killed with <code>signal 9 (SIGKILL)</code> or <code>collect2: fatal error: ld terminated with signal 9</code></b></summary>
-
-**Cause:** The Linux Out-Of-Memory (OOM) killer terminated a heavy C++/Rust linker process (such as `libwebviewchromium` or `clang++` LTO) when peak RAM spiked.
-
-**Fix:** Simply re-run your build command without passing custom high `-j` flags—`ninja` tracks completed targets and will resume right where it stopped:
-```bash
-mka bacon
-```
-</details>
-
-<details>
-<summary>🔴 <b>5. <code>No space left on device</code> during sync or build</b></summary>
-
-**Cause:** Your workspace reached its storage quota (often caused by old `out/` directories from previous builds or uncompressed `.repo` git packs).
-
-**Fix:**
-```bash
-# 1. Clean old build outputs (frees 100GB–200GB per ROM)
-mka clean
-
-# 2. Remove obsolete git objects from .repo
-repo forall -c 'git gc --prune=now'
-```
-</details>
-
-<details>
-<summary>🔴 <b>6. Dependency / SePolicy / Soong Namespace Conflicts After Changing Device Trees</b></summary>
+<summary>🔴 <b>2. Dependency / SePolicy / Soong Namespace Conflicts After Changing Device Trees</b></summary>
 
 **Cause:** Old generated makefiles or blueprints in `out/soong` are conflicting with newly added/removed device tree repositories.
 
@@ -359,7 +303,7 @@ mka clean
 </details>
 
 <details>
-<summary>🔴 <b>7. Git LFS Smudge Error / Corrupt Prebuilt Blobs (<code>not an ELF file</code> / <code>file too small</code>)</b></summary>
+<summary>🔴 <b>3. Git LFS Smudge Error / Corrupt Prebuilt Blobs (<code>not an ELF file</code> / <code>file too small</code>)</b></summary>
 
 **Cause:** Prebuilt vendor/GMS blobs tracked by `git-lfs` were checked out as tiny text pointer files instead of the actual binary files.
 
